@@ -22,36 +22,115 @@
       languages: nav.languages || [],
       deviceMemory: nav.deviceMemory || null,
       hardwareConcurrency: nav.hardwareConcurrency || null,
-      webdriver: nav.webdriver || false,
-      online: nav.onLine || false,
+      vendor: nav.vendor || null,
+      appName: nav.appName || null,
+      appVersion: nav.appVersion || null,
+      maxTouchPoints: nav.maxTouchPoints || 0,
+      onlineStatus: nav.onLine || false,
+      cookieEnabled: nav.cookieEnabled || false,
+      doNotTrack: nav.doNotTrack || null,
+      pdfViewerStatus: nav.pdfViewerEnabled || false,
+      webDriver: nav.webdriver || false,
+      connection: nav.connection || {},
+      mimeTypes: nav.mimeTypes || {},
+      plugins: nav.plugins || {},
+      product: nav.product || null,
+      productSub: nav.productSub || null,
+      userActivation: nav.userActivation || {},
+      userAgentData: nav.userAgentData || {},
+      virtualKeyboard: nav.virtualKeyboard || {},
     };
   }
 
   async function collectTabDetails() {
     return {
-      visibilityState: document.visibilityState,
-      hidden: document.hidden,
-      hasFocus: document.hasFocus(),
-      title: document.title,
+      state: {
+        visibilityState: document.visibilityState,
+        hidden: document.hidden,
+        hasFocus: document.hasFocus(),
+        readyState: document.readyState,
+      },
+      lifecycle: {
+        wasDiscarded: document.wasDiscarded || false,
+        prerendering: document.prerendering || false,
+      },
+      ui: {
+        fullscreen: !!document.fullscreenElement,
+        pointerLocked: !!document.pointerLockElement,
+      },
+      identity: {
+        title: document.title,
+      },
     };
   }
 
   async function collectUrlDetails() {
     const locationDetails = window.location;
+    var segments = locationDetails.pathname.split("/").filter(Boolean);
     return {
-      href: locationDetails.href,
-      origin: locationDetails.origin,
-      pathname: locationDetails.pathname,
+      raw: { href: locationDetails.href },
+      origin: {
+        protocol: locationDetails.protocol,
+        origin: locationDetails.origin,
+        host: locationDetails.host,
+        hostname: locationDetails.hostname,
+        port: locationDetails.port,
+        isSecure: locationDetails.protocol === "https:",
+      },
+      path: {
+        pathname: locationDetails.pathname,
+        segments: segments,
+        depth: segments.length,
+        hasTrailingSlash: locationDetails.pathname.endsWith("/"),
+      },
+      query: {
+        raw: locationDetails.search,
+        params: Object.fromEntries(new URLSearchParams(locationDetails.search)),
+      },
+      hash: locationDetails.hash,
+      auth: { passwordPresent: !!locationDetails.password },
+      navigation: { referrer: document.referrer || null },
     };
   }
 
   async function collectScreenDisplay() {
     const screenDetails = window.screen || {};
     return {
-      width: screenDetails.width,
-      height: screenDetails.height,
-      pixelRatio: window.devicePixelRatio || 1,
-      darkMode: matchMedia("(prefers-color-scheme: dark)").matches,
+      screen: {
+        width: screenDetails.width,
+        height: screenDetails.height,
+        availWidth: screenDetails.availWidth,
+        availHeight: screenDetails.availHeight,
+        colorDepth: screenDetails.colorDepth,
+        pixelDepth: screenDetails.pixelDepth,
+      },
+      viewport: {
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+        outerWidth: window.outerWidth,
+        outerHeight: window.outerHeight,
+      },
+      density: { devicePixelRatio: window.devicePixelRatio || 1 },
+      orientation: safe(
+        () => ({
+          type: screen.orientation.type,
+          angle: screen.orientation.angle,
+        }),
+        null,
+      ),
+      preferences: {
+        darkMode: matchMedia("(prefers-color-scheme: dark)").matches,
+        reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches,
+        highContrast: matchMedia("(prefers-contrast: more)").matches,
+      },
+      color: {
+        hdr: matchMedia("(dynamic-range: high)").matches,
+        gamut: {
+          srgb: matchMedia("(color-gamut: srgb)").matches,
+          p3: matchMedia("(color-gamut: p3)").matches,
+          rec2020: matchMedia("(color-gamut: rec2020)").matches,
+        },
+      },
     };
   }
 
