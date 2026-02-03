@@ -111,13 +111,6 @@
         outerHeight: window.outerHeight,
       },
       density: { devicePixelRatio: window.devicePixelRatio || 1 },
-      orientation: safe(
-        () => ({
-          type: screen.orientation.type,
-          angle: screen.orientation.angle,
-        }),
-        null,
-      ),
       preferences: {
         darkMode: matchMedia("(prefers-color-scheme: dark)").matches,
         reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches,
