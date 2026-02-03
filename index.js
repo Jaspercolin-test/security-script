@@ -134,27 +134,25 @@
     };
   }
 
-async function collectTimeLocale() {
-  const date = new Date();
+  async function collectTimeLocale() {
+    const date = new Date();
 
-  return {
-    time: {
-      nowISO: date.toISOString(),
-      epochMs: date.getTime(),
-      timezoneOffsetMinutes: date.getTimezoneOffset(),
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
-    },
-    
-    locale: {
-      primary: navigator.language || null,
-      calendar: Intl.DateTimeFormat().resolvedOptions().calendar || null,
-      numberingSystem: Intl.NumberFormat().resolvedOptions().numberingSystem || null
-    }
-  };
-}
+    return {
+      time: {
+        nowISO: date.toISOString(),
+        epochMs: date.getTime(),
+        timezoneOffsetMinutes: date.getTimezoneOffset(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+      },
 
-
-
+      locale: {
+        primary: navigator.language || null,
+        calendar: Intl.DateTimeFormat().resolvedOptions().calendar || null,
+        numberingSystem:
+          Intl.NumberFormat().resolvedOptions().numberingSystem || null,
+      },
+    };
+  }
 
   async function collectAll(trigger = "manual") {
     const data = {
